@@ -1,0 +1,11 @@
+#col-1 {
+  width: 50%;
+  float: left; }
+
+#col-2 {
+  width: 49%;
+  float: left; }
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none; }

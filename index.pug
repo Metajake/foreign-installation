@@ -1,0 +1,19 @@
+doctype html
+html(lang="en" dir="ltr")
+  head
+    <meta charset="utf-8">
+    <title>Foreign Installation</title>
+    link(rel="stylesheet" href="style.css")
+  body
+    <h1>Hello from HTML!</h1>
+    #col-1
+      input#roll-dice(type="submit" value="Roll Dice")
+      input#roll-value(type="number" value=0)
+      span#dice-outcome
+      #beings-container
+    #col-2
+      input#conclude-first-phase(type="submit" value="Conclude First Phase")
+      input#take-turn(type="submit" value="Take Turn")
+      span#turn-count
+    script(src="moment.js")
+    script(src="index.js")
