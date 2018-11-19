@@ -44,17 +44,20 @@ class Beings{
 
 class Being {
   constructor(hp, name, strength){
+    this.life = hp;
     this.hp = hp;
     this.name = name;
     this.strength = strength;
     this.defending = false;
     this.status = "";
     this.isInstalled = false;
+    this.alive = true;
 
     this.container = document.createElement("div");
     this.container.id = this.name
     this.container.classList.add("being")
 
+    this.historyContainer = document.createElement("h4");
     this.installationContainer = document.createElement("h4");
 
     var title = document.createElement("h4");
@@ -87,6 +90,7 @@ class Being {
     // }
     attackValue.appendChild(attackSelector);
 
+    this.container.appendChild(this.historyContainer);
     this.container.appendChild(this.installationContainer);
     this.container.appendChild(title)
     this.container.appendChild(this.hpContainer)
@@ -98,13 +102,6 @@ class Being {
     document.querySelector("#beings-container").append(this.container);
 
     this.speak()
-  }
-  appendInstallationContainer(){
-
-    if(this.isInstalled){
-      this.installationContainer.innerHTML = "&zeta; ";
-    }
-
   }
   createGUIButton(type){
     var button = document.createElement("input");
@@ -123,13 +120,17 @@ class Being {
   damage(amount){
     this.hp -= amount;
     this.hpContainer.innerHTML = this.hp;
+    this.checkIfDead();
   }
   defend(){
     this.defending = true;
     this.updateStatus("defending", "green");
   }
-  shed(){
-    this.overviewContainer.innerHTML = "Erasing my personal history."
+  checkIfDead(){
+    if(this.hp <= 0){
+      this.alive = false;
+      this.returnToSource();
+    }
   }
   updateStatus(message, color){
     this.statusContainer.innerHTML = message;
@@ -238,11 +239,40 @@ class EarthlyBeing extends Being {
   constructor(hp, name, strength){
     super(hp, name, strength);
     this.isInstalled = true;
+    this.personalHistory = 1;
     this.installationContainer.innerHTML = "&zeta; ";
+    this.historyContainer.innerHTML = "&odot; ";
     this.createGUIButton("shed");
   }
   speak(){
     this.overviewContainer.innerHTML = "I am a "+this.name+" of earth!"
+  }
+  shed(){
+    this.overviewContainer.innerHTML = "Erasing my personal history."
+    this.personalHistory -= 1;
+    this.historyContainer.innerHTML = "";
+  }
+  checkIfUninstalled(){
+    if(!this.personalHistory){
+      this.isInstalled = false;
+      this.installationContainer.innerHTML = "";
+    }
+  }
+  returnToSource(){
+    console.log("Returning to creative source.")
+    this.checkIfUninstalled();
+    if(!this.isInstalled){
+      if(dice.getRandom(3) <= 2){
+        beings.allBeings['monster'].damage(beings.allBeings['monster'].hp);
+      }
+    }else if(dice.getRandom(4 <= 1)){
+      beings.allBeings['monster'].damage(beings.allBeings['monster'].hp);
+    }else{
+      console.log("Your spirit is not ready to leave yet");
+      this.alive = true;
+      this.hp = this.life;
+      this.hpContainer.innerHTML = this.hp;
+    }
   }
 }
 
@@ -252,6 +282,9 @@ class Flyer extends Being {
   }
   speak(){
     this.overviewContainer.innerHTML = "I am a "+this.name+" not of this earth!"
+  }
+  returnToSource(){
+    console.log("Freedom in Infinity.");
   }
 }
 
