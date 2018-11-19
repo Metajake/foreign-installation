@@ -39,16 +39,21 @@ class Beings{
 }
 
 class Being {
-  constructor(hp, name){
+  constructor(hp, name, strength){
     this.hp = hp;
     this.name = name;
+    this.strength = strength;
     this.defending = false;
+    this.status = "";
 
     this.container = document.createElement("div");
     this.container.id = this.name
+    this.container.classList.add("being")
 
     var title = document.createElement("h4");
     title.innerHTML = this.name;
+
+    this.statusContainer = document.createElement("span");
 
     this.hpContainer = document.createElement("p");
     this.hpContainer.classList.add("hp")
@@ -69,15 +74,16 @@ class Being {
 
     var attackSelector = document.createElement("select");
     attackSelector.classList.add("attack-roll")
-    for(var i = 2; i < 21; i++){
+    // for(var i = 2; i < 21; i++){
       var valueOption = document.createElement("option");
-      valueOption.value = i;
-      valueOption.innerHTML = i;
+      valueOption.value = this.strength;
+      valueOption.innerHTML = this.strength;
       attackSelector.appendChild(valueOption);
-    }
+    // }
     attackValue.appendChild(attackSelector);
 
     this.container.appendChild(title)
+    this.container.appendChild(this.statusContainer)
     this.container.appendChild(this.hpContainer)
     this.container.appendChild(attackButton)
     this.container.appendChild(defendButton)
@@ -97,6 +103,11 @@ class Being {
   }
   defend(){
     this.defending = true;
+    this.updateStatus("defending", "green");
+  }
+  updateStatus(message, color){
+    this.statusContainer.innerHTML = message;
+    this.statusContainer.style.color = color;
   }
 }
 
@@ -110,7 +121,7 @@ class Game {
     this.roundContainer.innerHTML = this.round;
 
     this.characterDefending = false;
-    this.roundTarget = {};
+    this.roundTarget = "";
     this.roundDamage = 0;
   }
   takeTurn(){
@@ -120,29 +131,29 @@ class Game {
     }else{
       this.roundPosition ++;
     };
-    var currentPlayer = this.choosePlayer(this.roundPosition);
+    this.currentPlayer = this.choosePlayer(this.roundPosition);
     this.round ++
     this.roundContainer.innerHTML = this.roundPosition;
   }
-  chooseFirstTurn(){
+  chooseFirstRandomPlayer(){
     for(var key in beings.allBeings){this.numberOfPlayers ++;}
     this.roundPosition = dice.getRandomZero(this.numberOfPlayers)
     this.roundContainer.innerHTML = this.roundPosition;
     var firstPlayer = this.choosePlayer(this.roundPosition)
   }
   choosePlayer(position){
-    var chosenPlayer = beings.allBeings[Object.keys(beings.allBeings)[position]];
-    console.log(chosenPlayer.name);
+    this.currentPlayer = beings.allBeings[Object.keys(beings.allBeings)[position]];
     for(var key in beings.allBeings){
       beings.allBeings[key].container.classList.add("disabled");
     }
-    chosenPlayer.container.classList.remove("disabled");
-    return chosenPlayer;
+    this.currentPlayer.container.classList.remove("disabled");
+    return this.currentPlayer;
   }
   firstPhase(attackingTarget, attackingValue){
     this.roundTarget = attackingTarget;
     this.roundDamage = attackingValue;
     this.enableAllCharacters();
+    turnButton.classList.add("disabled");
   }
   secondPhase(){
     for(var key in beings.allBeings){
@@ -151,23 +162,32 @@ class Game {
         this.characterDefending = true;
       }
     }
-    if(!this.characterDefending){
+    if(!this.characterDefending && this.roundTarget.length){
       beings.allBeings[this.roundTarget].damage(this.roundDamage);
     }
+    this.enableCurrentPlayer();
     this.finalPhase();
   }
   finalPhase(){
     for(var key in beings.allBeings){
       beings.allBeings[key].defending = false;
+      beings.allBeings[key].updateStatus("","");
     }
     this.characterDefending = false;
     this.attackingTarget = {};
     this.roundDamage = 0;
+    turnButton.classList.remove("disabled");
   }
   enableAllCharacters(){
     for(var key in beings.allBeings){
       beings.allBeings[key].container.classList.remove("disabled");
     }
+  }
+  enableCurrentPlayer(){
+    for(var key in beings.allBeings){
+      beings.allBeings[key].container.classList.add("disabled");
+    }
+    this.currentPlayer.container.classList.remove("disabled");
   }
 }
 
@@ -175,17 +195,17 @@ let game = new Game();
 let dice = new Dice();
 let beings = new Beings();
 
-let monster = new Being(100, "monster");
+let monster = new Being(100, "monster", 20);
 beings.allBeings[monster.name] = monster;
 
-let knight = new Being(60, "knight");
+let knight = new Being(60, "knight", 20);
 beings.allBeings[knight.name] = knight;
 
-let shaman = new Being(40, "shaman");
+let shaman = new Being(40, "shaman", 10);
 beings.allBeings[shaman.name] = shaman;
 
 beings.createTargets();
-game.chooseFirstTurn();
+game.chooseFirstRandomPlayer();
 
 var diceRoller = document.querySelector("#roll-dice");
 diceRoller.addEventListener('click', function(){
