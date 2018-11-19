@@ -54,8 +54,10 @@ class Being {
     title.innerHTML = this.name;
 
     this.statusContainer = document.createElement("span");
+    this.overviewContainer = document.createElement("p");
+    this.overviewContainer.innerHTML = "chillin'";
 
-    this.hpContainer = document.createElement("p");
+    this.hpContainer = document.createElement("span");
     this.hpContainer.classList.add("hp")
     this.hpContainer.innerHTML = this.hp;
 
@@ -83,13 +85,16 @@ class Being {
     attackValue.appendChild(attackSelector);
 
     this.container.appendChild(title)
-    this.container.appendChild(this.statusContainer)
     this.container.appendChild(this.hpContainer)
+    this.container.appendChild(this.statusContainer)
+    this.container.appendChild(this.overviewContainer)
     this.container.appendChild(attackButton)
     this.container.appendChild(defendButton)
     this.container.appendChild(attackValue)
 
     document.querySelector("#beings-container").append(this.container);
+    
+    this.speak()
   }
   get hp(){
     return this.hp();
@@ -113,33 +118,33 @@ class Being {
 
 class Game {
   constructor(){
-    this.round = 0;
-    this.roundPosition = 0;
+    this.round = 1;
+    this.turnPosition = 0;
     this.numberOfPlayers = 0;
     this.currentPlayer = {};
     this.roundContainer = document.querySelector("#turn-count");
-    this.roundContainer.innerHTML = this.round;
+    this.turnStatusContainer = document.querySelector("#round-status");
 
     this.characterDefending = false;
     this.roundTarget = "";
     this.roundDamage = 0;
   }
   takeTurn(){
-    console.log("taking turn");
-    if(this.numberOfPlayers % (this.roundPosition) == 1 ){
-      this.roundPosition = 0;
+    if(this.numberOfPlayers % (this.turnPosition) == 1 ){
+      this.turnPosition = 0;
     }else{
-      this.roundPosition ++;
+      this.turnPosition ++;
     };
-    this.currentPlayer = this.choosePlayer(this.roundPosition);
+    this.currentPlayer = this.choosePlayer(this.turnPosition);
     this.round ++
-    this.roundContainer.innerHTML = this.roundPosition;
+    this.updateRoundStatus(1)
   }
   chooseFirstRandomPlayer(){
+    this.updateRoundStatus(1)
     for(var key in beings.allBeings){this.numberOfPlayers ++;}
-    this.roundPosition = dice.getRandomZero(this.numberOfPlayers)
-    this.roundContainer.innerHTML = this.roundPosition;
-    var firstPlayer = this.choosePlayer(this.roundPosition)
+    this.turnPosition = dice.getRandomZero(this.numberOfPlayers)
+    this.choosePlayer(this.turnPosition)
+    console.log(this.round)
   }
   choosePlayer(position){
     this.currentPlayer = beings.allBeings[Object.keys(beings.allBeings)[position]];
@@ -154,6 +159,8 @@ class Game {
     this.roundDamage = attackingValue;
     this.enableAllCharacters();
     turnButton.classList.add("disabled");
+    this.updateRoundStatus(2)
+    this.currentPlayer.updateStatus("Attacking " + this.roundTarget, "red");
   }
   secondPhase(){
     for(var key in beings.allBeings){
@@ -169,14 +176,9 @@ class Game {
     this.finalPhase();
   }
   finalPhase(){
-    for(var key in beings.allBeings){
-      beings.allBeings[key].defending = false;
-      beings.allBeings[key].updateStatus("","");
-    }
-    this.characterDefending = false;
-    this.attackingTarget = {};
-    this.roundDamage = 0;
-    turnButton.classList.remove("disabled");
+    this.updateRoundStatus(3)
+    this.checkWin()
+    this.resetRoundVariables();
   }
   enableAllCharacters(){
     for(var key in beings.allBeings){
@@ -189,20 +191,61 @@ class Game {
     }
     this.currentPlayer.container.classList.remove("disabled");
   }
+  resetRoundVariables(){
+    for(var key in beings.allBeings){
+      beings.allBeings[key].defending = false;
+      beings.allBeings[key].updateStatus("","");
+    }
+    this.characterDefending = false;
+    this.roundTarget = {};
+    this.roundDamage = 0;
+    turnButton.classList.remove("disabled");
+  }
+  checkWin(){
+    if (beings.allBeings['monster'].hp <= 0){
+      console.log("Knight Wins")
+    }else if (beings.allBeings['shaman'].hp <= 0 && beings.allBeings['monster'].hp <= 0){
+      console.log("Shaman Wins!")
+    }
+  }
+  updateRoundStatus(phase){
+    this.turnStatusContainer.innerHTML = "Round "+ this.round + ", Phase " + phase;
+  }
+}
+
+class EarthlyBeing extends Being {
+  constructor(hp, name, strength){
+    super(hp, name, strength);
+  }
+  speak(){
+    this.overviewContainer.innerHTML = "I am a "+this.name+" of earth!"
+  }
+}
+
+class Flyer extends Being {
+  constructor(hp, name, strength){
+    super(hp, name, strength);
+  }
+  speak(){
+    this.overviewContainer.innerHTML = "I am a "+this.name+" not of this earth!"
+  }
 }
 
 let game = new Game();
 let dice = new Dice();
 let beings = new Beings();
 
-let monster = new Being(100, "monster", 20);
+let monster = new Flyer(50, "monster", 20);
 beings.allBeings[monster.name] = monster;
 
-let knight = new Being(60, "knight", 20);
+let knight = new EarthlyBeing(60, "knight", 40);
 beings.allBeings[knight.name] = knight;
 
-let shaman = new Being(40, "shaman", 10);
+let shaman = new EarthlyBeing(40, "shaman", 10);
 beings.allBeings[shaman.name] = shaman;
+
+// let bard = new EarthlyBeing(20, "bard", 5);
+// beings.allBeings[bard.name] = bard;
 
 beings.createTargets();
 game.chooseFirstRandomPlayer();
@@ -226,7 +269,6 @@ var defendButtons = document.querySelectorAll(".defend")
 defendButtons.forEach(function(element){
   element.addEventListener("click", function(event){
     var defender = element.parentNode.id;
-    console.log(defender);
     beings.allBeings[defender].defend();
   })
 })
