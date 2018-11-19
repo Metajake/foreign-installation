@@ -1,3 +1,7 @@
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 class Dice {
   constructor() {
 
@@ -45,15 +49,19 @@ class Being {
     this.strength = strength;
     this.defending = false;
     this.status = "";
+    this.isInstalled = false;
 
     this.container = document.createElement("div");
     this.container.id = this.name
     this.container.classList.add("being")
 
+    this.installationContainer = document.createElement("h4");
+
     var title = document.createElement("h4");
     title.innerHTML = this.name;
 
     this.statusContainer = document.createElement("span");
+
     this.overviewContainer = document.createElement("p");
     this.overviewContainer.innerHTML = "chillin'";
 
@@ -61,15 +69,10 @@ class Being {
     this.hpContainer.classList.add("hp")
     this.hpContainer.innerHTML = this.hp;
 
-    var attackButton = document.createElement("input");
-    attackButton.classList.add("attack");
-    attackButton.type = "submit";
-    attackButton.value = "Attack";
-
-    var defendButton = document.createElement("input");
-    defendButton.classList.add("defend");
-    defendButton.type = "submit";
-    defendButton.value = "Defend";
+    this.buttonContainer = document.createElement("div");
+    this.buttonContainer.classList.add("button-container");
+    var attackButton = this.createGUIButton("attack");
+    var defendButton = this.createGUIButton("defend");
 
     var attackValue = document.createElement("div");
     attackValue.classList.add("attack-value");
@@ -84,17 +87,32 @@ class Being {
     // }
     attackValue.appendChild(attackSelector);
 
+    this.container.appendChild(this.installationContainer);
     this.container.appendChild(title)
     this.container.appendChild(this.hpContainer)
     this.container.appendChild(this.statusContainer)
     this.container.appendChild(this.overviewContainer)
-    this.container.appendChild(attackButton)
-    this.container.appendChild(defendButton)
+    this.container.appendChild(this.buttonContainer)
     this.container.appendChild(attackValue)
 
     document.querySelector("#beings-container").append(this.container);
-    
+
     this.speak()
+  }
+  appendInstallationContainer(){
+
+    if(this.isInstalled){
+      this.installationContainer.innerHTML = "&zeta; ";
+    }
+
+  }
+  createGUIButton(type){
+    var button = document.createElement("input");
+    button.classList.add(type);
+    button.type = "submit";
+    button.value = capitalizeFirstLetter(type);
+    this.buttonContainer.appendChild(button);
+    return button
   }
   get hp(){
     return this.hp();
@@ -109,6 +127,9 @@ class Being {
   defend(){
     this.defending = true;
     this.updateStatus("defending", "green");
+  }
+  shed(){
+    this.overviewContainer.innerHTML = "Erasing my personal history."
   }
   updateStatus(message, color){
     this.statusContainer.innerHTML = message;
@@ -144,7 +165,7 @@ class Game {
     for(var key in beings.allBeings){this.numberOfPlayers ++;}
     this.turnPosition = dice.getRandomZero(this.numberOfPlayers)
     this.choosePlayer(this.turnPosition)
-    console.log(this.round)
+    console.log("starting round: "+this.round)
   }
   choosePlayer(position){
     this.currentPlayer = beings.allBeings[Object.keys(beings.allBeings)[position]];
@@ -154,13 +175,13 @@ class Game {
     this.currentPlayer.container.classList.remove("disabled");
     return this.currentPlayer;
   }
-  firstPhase(attackingTarget, attackingValue){
+  firstPhase(action, attackingTarget, attackingValue, color){
     this.roundTarget = attackingTarget;
     this.roundDamage = attackingValue;
     this.enableAllCharacters();
     turnButton.classList.add("disabled");
     this.updateRoundStatus(2)
-    this.currentPlayer.updateStatus("Attacking " + this.roundTarget, "red");
+    this.currentPlayer.updateStatus(action + " " + this.roundTarget, color);
   }
   secondPhase(){
     for(var key in beings.allBeings){
@@ -216,6 +237,9 @@ class Game {
 class EarthlyBeing extends Being {
   constructor(hp, name, strength){
     super(hp, name, strength);
+    this.isInstalled = true;
+    this.installationContainer.innerHTML = "&zeta; ";
+    this.createGUIButton("shed");
   }
   speak(){
     this.overviewContainer.innerHTML = "I am a "+this.name+" of earth!"
@@ -238,8 +262,8 @@ let beings = new Beings();
 let monster = new Flyer(50, "monster", 20);
 beings.allBeings[monster.name] = monster;
 
-let knight = new EarthlyBeing(60, "knight", 40);
-beings.allBeings[knight.name] = knight;
+let warrior = new EarthlyBeing(60, "warrior", 40);
+beings.allBeings[warrior.name] = warrior;
 
 let shaman = new EarthlyBeing(40, "shaman", 10);
 beings.allBeings[shaman.name] = shaman;
@@ -258,18 +282,27 @@ diceRoller.addEventListener('click', function(){
 var attackButtons = document.querySelectorAll(".attack")
 attackButtons.forEach(function(element){
   element.addEventListener("click", function(event){
-    var attackingTarget = element.parentNode.querySelector(".attack-target").value;
-    var attackingDiceValue = element.parentNode.querySelector(".attack-roll").value;
+    var attackingTarget = element.parentNode.parentNode.querySelector(".attack-target").value;
+    var attackingDiceValue = element.parentNode.parentNode.querySelector(".attack-roll").value;
     var attackingValue = dice.roll(attackingDiceValue);
-    game.firstPhase(attackingTarget, attackingValue);
+    game.firstPhase("Attacking", attackingTarget, attackingValue, "red");
   })
 })
 
 var defendButtons = document.querySelectorAll(".defend")
 defendButtons.forEach(function(element){
   element.addEventListener("click", function(event){
-    var defender = element.parentNode.id;
+    var defender = element.parentNode.parentNode.id;
     beings.allBeings[defender].defend();
+  })
+})
+
+var shedButtons = document.querySelectorAll(".shed")
+shedButtons.forEach(function(element){
+  element.addEventListener("click", function(event){
+    var shedder = element.parentNode.parentNode.id;
+    beings.allBeings[shedder].shed();
+    game.firstPhase("Shedding", "", 0, "blue");
   })
 })
 
