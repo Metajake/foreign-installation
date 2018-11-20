@@ -52,6 +52,9 @@ class Game {
       }
     }
     if(!this.characterDefending && this.roundTarget.length){
+      if(this.currentPlayer.name == this.roundTarget){
+        this.roundDamage = beings.allBeings[this.roundTarget].hp;
+      };
       beings.allBeings[this.roundTarget].damage(this.roundDamage);
     }
     this.enableCurrentPlayer();

@@ -153,7 +153,7 @@ class EarthlyBeing extends Being {
         beings.allBeings['monster'].overviewContainer.innerHTML = "I continue to feast on your energy.";
         this.checkRevive()
       }
-    }else if(dice.getRandom(9) <= 9){ //11% Chance to kill monster
+    }else if(dice.getRandom(9) <= 1){ //11% Chance to kill monster
       beings.allBeings['monster'].damage(beings.allBeings['monster'].hp);
     }else{
       beings.allBeings['monster'].overviewContainer.innerHTML = "I continue to feast on your energy.";
