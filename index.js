@@ -2,6 +2,14 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
 let game = new Game();
 let dice = new Dice();
 let beings = new Beings();
@@ -16,8 +24,8 @@ beings.allBeings[warrior.name] = warrior;
 let shaman = new EarthlyBeing(40, "shaman", 10);
 beings.allBeings[shaman.name] = shaman;
 
-// let bard = new EarthlyBeing(20, "bard", 5);
-// beings.allBeings[bard.name] = bard;
+let bard = new EarthlyBeing(20, "bard", 5);
+beings.allBeings[bard.name] = bard;
 
 beings.createTargets();
 game.chooseFirstRandomPlayer();
@@ -42,7 +50,7 @@ defendButtons.forEach(function(element){
   element.addEventListener("click", function(event){
     var defender = element.parentNode.parentNode.id;
     beings.allBeings[defender].defend();
-    people.increaseInfluence(0.5)
+    people.increaseInfluence(2)
   })
 })
 

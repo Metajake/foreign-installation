@@ -1,7 +1,7 @@
 class People{
   constructor(){
     this.peopleCount = 1000;
-    this.underInfluence = 0;
+    this.underInfluence = dice.getRandom(10);
     this.influence = 10;
     this.influenceContainer = document.querySelector("#influence-count");
     this.peopleContainer = document.querySelector("#people-count");
@@ -13,10 +13,10 @@ class People{
     this.influenceContainer.innerHTML = this.underInfluence;
   }
   getRoundInfluenceCount(){
-    var installations = 2;
+    var installations = 0;
     for(var being in beings.allBeings){
       if(beings.allBeings[being].isInstalled){
-        installations += 1;
+        installations += 3;
       };
     }
     return installations

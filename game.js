@@ -1,11 +1,14 @@
 class Game {
   constructor(){
     this.round = 1;
+    this.day = 10;
     this.turnPosition = 0;
     this.numberOfPlayers = 0;
     this.currentPlayer = {};
     this.roundContainer = document.querySelector("#turn-count");
     this.turnStatusContainer = document.querySelector("#round-status");
+    this.dayContainer = document.querySelector("#day-container");
+    this.dayContainer.innerHTML = this.day;
 
     this.characterDefending = false;
     this.roundTarget = "";
@@ -19,14 +22,21 @@ class Game {
     };
     this.currentPlayer = this.choosePlayer(this.turnPosition);
     this.round ++
+    this.updateDay()
     this.updateRoundStatus(1)
+  }
+  updateDay(){
+    if((this.round-1) % this.numberOfPlayers == 0 ){
+      this.day --
+      this.dayContainer.innerHTML = this.day;
+      if(this.day ==0){console.log("Bard Wins")}
+    }
   }
   chooseFirstRandomPlayer(){
     this.updateRoundStatus(1)
     for(var key in beings.allBeings){this.numberOfPlayers ++;}
     this.turnPosition = dice.getRandomZero(this.numberOfPlayers)
     this.choosePlayer(this.turnPosition)
-    console.log("starting round: "+this.round)
   }
   choosePlayer(position){
     this.currentPlayer = beings.allBeings[Object.keys(beings.allBeings)[position]];
@@ -96,9 +106,9 @@ class Game {
   checkActionInfluence(action){
     if (this.currentPlayer.isInstalled){
       if(action == 'Attacking'){
-        people.increaseInfluence(2)
+        people.increaseInfluence(5)
       }else if(action == "Dreaming" || action == "Shedding"){
-        people.increaseInfluence(1)
+        people.increaseInfluence(3)
       }
     }
   }

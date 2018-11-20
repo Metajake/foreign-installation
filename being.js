@@ -16,6 +16,7 @@ class Being {
     this.container.classList.add("being")
 
     this.historyContainer = document.createElement("h4");
+    this.importanceContainer = document.createElement("h4");
     this.installationContainer = document.createElement("h4");
     this.dreamingContainer = document.createElement("h4");
 
@@ -25,7 +26,6 @@ class Being {
     this.statusContainer = document.createElement("span");
 
     this.overviewContainer = document.createElement("p");
-    this.overviewContainer.innerHTML = "chillin'";
 
     this.hpContainer = document.createElement("span");
     this.hpContainer.classList.add("hp")
@@ -51,6 +51,7 @@ class Being {
     attackValue.appendChild(attackSelector);
 
     this.container.appendChild(this.historyContainer);
+    this.container.appendChild(this.importanceContainer);
     this.container.appendChild(this.installationContainer);
     this.container.appendChild(this.dreamingContainer);
     this.container.appendChild(title)
@@ -124,28 +125,42 @@ class EarthlyBeing extends Being {
   constructor(hp, name, strength){
     super(hp, name, strength);
     this.isInstalled = true;
-    this.personalHistory = 1;
+    this.installationProgress = 0;
     this.installationContainer.innerHTML = "&zeta; ";
     this.historyContainer.innerHTML = "&odot; ";
+    this.importanceContainer.innerHTML = "&dagger; ";
     this.createGUIButton("shed");
+    this.humanConditions = {
+      personalHistory : {
+        exists: true,
+        description: "Erasing my personal history.",
+        container: this.historyContainer,
+      },
+      selfImportance : {
+        exists: true,
+        description: "Loosing Self Importance.",
+        container: this.importanceContainer,
+      },
+    }
   }
   speak(){
     this.overviewContainer.innerHTML = "I am a "+this.name+" of earth!"
   }
   shed(){
-    this.overviewContainer.innerHTML = "Erasing my personal history."
-    this.personalHistory -= 1;
-    this.historyContainer.innerHTML = "";
-  }
-  checkIfUninstalled(){
-    if(!this.personalHistory){
+    if(this.installationProgress == Object.size(this.humanConditions)){
+      this.overviewContainer.innerHTML = "Uninstalling my foreign installation."
       this.isInstalled = false;
       this.installationContainer.innerHTML = "";
+    }else{
+      // console.log(this.humanConditions[Object.keys(this.humanConditions)[this.installationProgress]].description)
+      this.overviewContainer.innerHTML = this.humanConditions[Object.keys(this.humanConditions)[this.installationProgress]].description;
+      this.humanConditions[Object.keys(this.humanConditions)[this.installationProgress]].exists = false;
+      this.humanConditions[Object.keys(this.humanConditions)[this.installationProgress]].container.innerHTML = "";
+      this.installationProgress ++;
     }
   }
   returnToSource(){
     console.log("Returning to creative source.")
-    this.checkIfUninstalled();
     if(!this.isInstalled){
       if(dice.getRandom(5) <= 4){ //75% Chance to kill monster
         beings.allBeings['monster'].damage(beings.allBeings['monster'].hp);
@@ -171,5 +186,8 @@ class Flyer extends Being {
   }
   returnToSource(){
     console.log("Freedom in Infinity.");
+  }
+  dream(){
+    people.influence += 10;
   }
 }

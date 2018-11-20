@@ -4,16 +4,18 @@
 <title>Foreign Installation</title>
     <link rel="stylesheet" href="style.css">
   </head>
-  <body><h1>Dice Game</h1><span>To Do: day countdown (for bard win), Influence countup (for monster win)</span>
+  <body>
     <div id="col-1">
-      <input id="roll-dice" type="submit" value="Roll Dice">
-      <input id="roll-value" type="number" value="1"><span id="dice-outcome"></span>
       <div id="beings-container"></div>
     </div>
     <div id="col-2">
-      <input id="conclude-first-phase" type="submit" value="Conclude First and Second Phase">
+      <h1>Dice Game</h1>
+      <h2>Time <span id="day-container"></span></h2><span>To Do: Turn Foreign Installation into Sequence (not death)</span><br>
+      <input class="top-20" id="roll-dice" type="submit" value="Roll Dice">
+      <input id="roll-value" type="number" value="1"><span id="dice-outcome"></span><br>
+      <input class="top-20" id="conclude-first-phase" type="submit" value="Conclude First and Second Phase">
       <input id="take-turn" type="submit" value="Take Turn">
-      <p id="round-status"></p>
+      <p class="top-20" id="round-status"></p>
       <h3>People</h3>
       <p><span id="influence-count"></span><span> / </span><span id="people-count"></span></p>
     </div>
