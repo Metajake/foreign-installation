@@ -43,25 +43,24 @@ class Game {
     turnButton.classList.add("disabled");
     this.updateRoundStatus(2)
     this.currentPlayer.updateStatus(action + " " + this.roundTarget, color);
+
+    this.checkActionInfluence(action)
   }
   secondPhase(){
-    for(var key in beings.allBeings){
-      if(beings.allBeings[key].defending){
-        beings.allBeings[key].damage(this.roundDamage)
-        this.characterDefending = true;
-      }
-    }
+    this.checkDamageDefendingCharacter()
+
     if(!this.characterDefending && this.roundTarget.length){
       if(this.currentPlayer.name == this.roundTarget){
         this.roundDamage = beings.allBeings[this.roundTarget].hp;
       };
       beings.allBeings[this.roundTarget].damage(this.roundDamage);
     }
-    this.enableCurrentPlayer();
+    this.enableOnlyCurrentPlayer();
     this.finalPhase();
   }
   finalPhase(){
     this.updateRoundStatus(3)
+    people.increaseInfluence(people.getRoundInfluenceCount())
     this.checkWin()
     this.resetRoundVariables();
   }
@@ -70,7 +69,7 @@ class Game {
       beings.allBeings[key].container.classList.remove("disabled");
     }
   }
-  enableCurrentPlayer(){
+  enableOnlyCurrentPlayer(){
     for(var key in beings.allBeings){
       beings.allBeings[key].container.classList.add("disabled");
     }
@@ -86,7 +85,28 @@ class Game {
     this.roundDamage = 0;
     turnButton.classList.remove("disabled");
   }
+  checkDamageDefendingCharacter(){
+    for(var key in beings.allBeings){
+      if(beings.allBeings[key].defending){
+        beings.allBeings[key].damage(this.roundDamage)
+        this.characterDefending = true;
+      }
+    }
+  }
+  checkActionInfluence(action){
+    if (this.currentPlayer.isInstalled){
+      if(action == 'Attacking'){
+        people.increaseInfluence(2)
+      }else if(action == "Dreaming" || action == "Shedding"){
+        people.increaseInfluence(1)
+      }
+    }
+  }
   checkWin(){
+    if(people.underInfluence >= people.peopleCount){
+      console.log("Monster Wins");
+      return
+    }
     if (beings.allBeings['monster'].hp <= 0){
       console.log("Knight Wins")
     }

@@ -5,6 +5,7 @@ function capitalizeFirstLetter(string) {
 let game = new Game();
 let dice = new Dice();
 let beings = new Beings();
+let people = new People();
 
 let monster = new Flyer(50, "monster", 20);
 beings.allBeings[monster.name] = monster;
@@ -41,6 +42,7 @@ defendButtons.forEach(function(element){
   element.addEventListener("click", function(event){
     var defender = element.parentNode.parentNode.id;
     beings.allBeings[defender].defend();
+    people.increaseInfluence(0.5)
   })
 })
 

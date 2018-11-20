@@ -13,12 +13,19 @@ html(lang="en" dir="ltr")
       span#dice-outcome
       #beings-container
     #col-2
-      input#conclude-first-phase(type="submit" value="Conclude First Phase")
+      input#conclude-first-phase(type="submit" value="Conclude First and Second Phase")
       input#take-turn(type="submit" value="Take Turn")
       //- span#turn-count
       p#round-status
+      h3 People
+      p
+        span#influence-count
+        span  / 
+        span#people-count
+        
+    script(src="game.js")
     script(src="dice.js")
     script(src="beings.js")
     script(src="being.js")
-    script(src="game.js")
+    script(src="people.js")
     script(src="index.js")
